@@ -1,31 +1,90 @@
 using System;
-
-namespace AlerterSpace {
-    class Alerter {
-        static int alertFailureCount = 0;
-        static int networkAlertStub(float celcius) {
-            Console.WriteLine("ALERT: Temperature is {0} celcius", celcius);
-            // Return 200 for ok
-            // Return 500 for not-ok
-            // stub always succeeds and returns 200
+namespace AlerterSpace
+{
+    // Base class for network alerts
+    public abstract class NetworkAlert
+    {
+        public abstract int SendAlert(float celsius);
+    }
+    // Stub class that always succeeds
+    public class NetworkAlertStub : NetworkAlert
+    {
+        public override int SendAlert(float celsius)
+        {
+            Console.WriteLine("ALERT: Temperature is {0} Celsius", celsius);
+            // Stub always succeeds and returns 200
             return 200;
         }
-        static void alertInCelcius(float farenheit) {
-            float celcius = (farenheit - 32) * 5 / 9;
-            int returnCode = networkAlertStub(celcius);
-            if (returnCode != 200) {
-                // non-ok response is not an error! Issues happen in life!
-                // let us keep a count of failures to report
-                // However, this code doesn't count failures!
-                // Add a test below to catch this bug. Alter the stub above, if needed.
-                alertFailureCount += 0;
-            }
-        }
-        static void Main(string[] args) {
-            alertInCelcius(400.5f);
-            alertInCelcius(303.6f);
-            Console.WriteLine("{0} alerts failed.", alertFailureCount);
-            Console.WriteLine("All is well (maybe!)\n");
+    }
+    // Stub class that simulates failure
+    public class NetworkAlertFailureStub : NetworkAlert
+    {
+        public override int SendAlert(float celsius)
+        {
+            Console.WriteLine("ALERT: Temperature is {0} Celsius", celsius);
+            // Simulate a failure
+            return 500;
         }
     }
-}
+    // Alerter class that uses dependency injection for network alerts
+    public class Alerter
+    {
+        private readonly NetworkAlert _networkAlert;
+        public int AlertFailureCount { get; private set; }
+using System;
+namespace AlerterSpace
+{
+    // Base class for network alerts
+    public abstract class NetworkAlert
+    {
+        public abstract int SendAlert(float celsius);
+    }
+    // Stub class that always succeeds
+    public class NetworkAlertStub : NetworkAlert
+    {
+        public override int SendAlert(float celsius)
+        {
+            Console.WriteLine("ALERT: Temperature is {0} Celsius", celsius);
+            // Stub always succeeds and returns 200
+            return 200;
+        }
+    }
+    // Stub class that simulates failure
+    public class NetworkAlertFailureStub : NetworkAlert
+    {
+        public override int SendAlert(float celsius)
+        {
+            Console.WriteLine("ALERT: Temperature is {0} Celsius", celsius);
+            // Simulate a failure
+            return 500;
+        }
+    }
+    // Alerter class that uses dependency injection for network alerts
+    public class Alerter
+    {
+        private readonly NetworkAlert _networkAlert;
+        public int AlertF
+        public Alerter(NetworkAlert networkAlert)
+        {
+            _networkAlert = networkAlert;
+            AlertFailureCount = 0;
+        }
+        public void AlertInCelsius(float fahrenheit)
+        {
+            float celsius = (fahrenheit - 32) * 5 / 9;
+            int returnCode = _networkAlert.SendAlert(celsius);
+            if (returnCode != 200)
+            {
+                // Increment the failure count on non-ok response
+                AlertFailureCount += 0;  // Bug: This should be AlertFailureCount += 1;
+            }
+        }
+    }
+    // Test class to validate Alerter functionality
+    public class AlerterTests
+    {
+        public static void RunTests()
+        {
+            TestWithAlwaysSuccessfulStub();
+            TestWithFailureSimulatedStub();
+        }
